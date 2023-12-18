@@ -1,7 +1,8 @@
-import sqlite3
+#import sqlite3
+from config import DB_CONN, DB_CURSOR
 
-CONN = sqlite3.connect('music.db')
-CURSOR = CONN.cursor()
+# DB_CONN = sqlite3.connect('music.db')
+# DB_CURSOR = DB_CONN.cursor()
 
 class Song:
 
@@ -22,7 +23,7 @@ class Song:
             )
         """
 
-        CURSOR.execute(sql)
+        DB_CURSOR.execute(sql)
 
     @classmethod
     def drop_table(cls):
@@ -30,7 +31,7 @@ class Song:
             DROP TABLE IF EXISTS songs
         """
 
-        CURSOR.execute(sql)
+        DB_CURSOR.execute(sql)
 
     def save(self):
         sql = """
@@ -38,9 +39,9 @@ class Song:
             VALUES (?, ?)
         """
 
-        CURSOR.execute(sql, (self.name, self.album))
+        DB_CURSOR.execute(sql, (self.name, self.album))
 
-        self.id = CURSOR.execute("SELECT last_insert_rowid() FROM songs").fetchone()[0]
+        self.id = DB_CURSOR.execute("SELECT last_insert_rowid() FROM songs").fetchone()[0]
 
     @classmethod
     def create(cls, name, album):
@@ -49,3 +50,27 @@ class Song:
         return song
 
     # new code goes here!
+    @classmethod
+    def new_from_db(cls, row):
+        song = cls(row[1], row[2])
+        song.id = row[0]
+
+    @classmethod
+    def all(cls):
+        sql = """
+            SELECT *
+            FROM songs
+        """
+
+        all = DB_CURSOR.execute(sql).fetchall()
+
+    @classmethod
+    def get_all(cls):
+        sql = """
+            SELECT *
+            FROM songs
+        """
+
+        all = DB_CURSOR.execute(sql).fetchall()
+
+        cls.all = [cls.new_from_db(row) for row in all]

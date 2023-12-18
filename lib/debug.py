@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-from song import Song, CONN, CURSOR
+from song import Song
+from config import DB_CONN, DB_CURSOR
 
 def reset_database():
     Song.drop_table()
